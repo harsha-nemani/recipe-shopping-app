@@ -1,14 +1,19 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpParams,
+  HttpErrorResponse,
+} from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
-interface AuthResponseData {
+export interface AuthResponseData {
   idToken: string;
   email: string;
   refreshToken: string;
   expiresIn: string;
   localId: string;
+  registered?: string;
 }
 
 @Injectable({
@@ -40,19 +45,42 @@ export class AuthService {
           params: new HttpParams().set('key', this.api_key),
         }
       )
-      .pipe(
-        catchError((errorResponse) => {
-          let errorMessage = 'An unknown error occured!';
-          if (!errorResponse.error || !errorResponse.error.error) {
-            return throwError(errorMessage);
-          }
-          switch (errorResponse.error.error.message) {
-            case 'EMAIL_EXISTS':
-              errorMessage = 'This email exists already';
-          }
+      .pipe(catchError(this.handleErrror));
+  }
 
-          return throwError(errorMessage);
-        })
-      );
+  login(email: string, password: string) {
+    return this.http
+      .post<AuthResponseData>(
+        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword',
+        {
+          email: email,
+          password: password,
+          returnSecureToken: true,
+        },
+        {
+          params: new HttpParams().set('key', this.api_key),
+        }
+      )
+      .pipe(catchError(this.handleErrror));
+  }
+
+  private handleErrror(errorRes: HttpErrorResponse) {
+    let errorMessage = 'An unknown error occured!';
+    if (!errorRes.error || !errorRes.error.error) {
+      return throwError(errorMessage);
+    }
+    switch (errorRes.error.error.message) {
+      case 'EMAIL_EXISTS':
+        errorMessage = 'This email exists already';
+        break;
+      case 'EMAIL_NOT_FOUND':
+        errorMessage = 'This email does not exist';
+        break;
+      case 'INVALID_PASSWORD':
+        errorMessage = 'This password is not correct';
+        break;
+    }
+
+    return throwError(errorMessage);
   }
 }
