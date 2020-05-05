@@ -16,7 +16,9 @@ export class AuthComponent implements OnInit {
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.authService.setAPIKey();
+  }
 
   onSwitchMode() {
     this.isLoginMode = !this.isLoginMode;
@@ -30,7 +32,6 @@ export class AuthComponent implements OnInit {
     const password = form.value.password;
 
     this.isLoading = true;
-    console.log(this.isLoading);
 
     let authObs: Observable<AuthResponseData>;
 

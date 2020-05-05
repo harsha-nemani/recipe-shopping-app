@@ -5,8 +5,10 @@ import {
   HttpErrorResponse,
 } from '@angular/common/http';
 import { catchError, tap } from 'rxjs/operators';
-import { throwError, Subject } from 'rxjs';
-import { User } from './userr.model';
+import { throwError, Subject, BehaviorSubject } from 'rxjs';
+import { Router } from '@angular/router';
+
+import { User } from './user.model';
 
 export interface AuthResponseData {
   idToken: string;
@@ -22,10 +24,12 @@ export interface AuthResponseData {
 })
 export class AuthService {
   private api_key: string;
-  user = new Subject<User>();
+  user = new BehaviorSubject<User>(null);
 
-  constructor(private http: HttpClient) {
-    http
+  constructor(private http: HttpClient, private router: Router) {}
+
+  setAPIKey() {
+    this.http
       .get('assets/creds.json', { responseType: 'json' })
       .subscribe((data) => {
         this.api_key = data['api_key'];
@@ -96,6 +100,11 @@ export class AuthService {
     const user = new User(email, userId, token, expDate);
 
     this.user.next(user);
+  }
+
+  logout() {
+    this.user.next(null);
+    this.router.navigate(['/auth']);
   }
 
   private handleErrror(errorRes: HttpErrorResponse) {
