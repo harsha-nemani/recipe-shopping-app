@@ -46,4 +46,4 @@ testem.log
 Thumbs.db
 
 #Credentials
-assets/creds.json
+src/assets/creds.json
