@@ -32,9 +32,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     private componentFactoryResolver: ComponentFactoryResolver
   ) {}
 
-  ngOnInit(): void {
-    this.authService.setAPIKey();
-  }
+  ngOnInit(): void {}
 
   onSwitchMode() {
     this.isLoginMode = !this.isLoginMode;

@@ -9,6 +9,7 @@ import { throwError, Subject, BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
 
 import { User } from './user.model';
+import { environment } from 'src/environments/environment';
 
 export interface AuthResponseData {
   idToken: string;
@@ -23,20 +24,11 @@ export interface AuthResponseData {
   providedIn: 'root',
 })
 export class AuthService {
-  private api_key: string;
+  private api_key: string = environment.api_key;
   user = new BehaviorSubject<User>(null);
   private tokenExpirationTimer: any;
 
   constructor(private http: HttpClient, private router: Router) {}
-
-  setAPIKey() {
-    this.http
-      .get('assets/creds.json', { responseType: 'json' })
-      .subscribe((data) => {
-        this.api_key = data['api_key'];
-        console.log(data);
-      });
-  }
 
   signUp(email: string, password: string) {
     console.log(this.api_key);
