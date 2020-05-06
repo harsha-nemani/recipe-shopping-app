@@ -149,6 +149,7 @@ export class AuthService {
   private handleErrror(errorRes: HttpErrorResponse) {
     let errorMessage = 'An unknown error occured!';
     if (!errorRes.error || !errorRes.error.error) {
+      console.log(errorRes);
       return throwError(errorMessage);
     }
     switch (errorRes.error.error.message) {
